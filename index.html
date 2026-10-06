@@ -1,0 +1,1230 @@
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Chair Library</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #ece8df;
+    --paper: #f6f3ec;
+    --panel: #f2eee4;
+    --ink: #241f19;
+    --ink-soft: #5b5346;
+    --muted: #8a8072;
+    --line: #d9d2c3;
+    --accent: #a15a2e;
+    --accent-soft: #ecdfcd;
+    --tag-bg: #e4ddcc;
+    --tag-ink: #5b5346;
+    --na: #4a5d52; --na-bg: #dfe6df;
+    --eu: #4a5a7a; --eu-bg: #dfe4ee;
+    --as: #8a4a22; --as-bg: #f0dfcc;
+    --sofa-accent: #2f5d3a;
+    --ctl-h: 37px;   /* 헤더 검색창·버튼 공통 높이 */
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans KR", "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 14.5px;
+    display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+  }
+
+  /* ---- Header ---- */
+  .hdr {
+    height: 60px; flex-shrink: 0; background: var(--paper); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 16px; padding: 0 20px;
+  }
+  .hdr-brand { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .hdr-title { font-family: "Zilla Slab", serif; font-weight: 700; font-size: 24px; letter-spacing: -0.01em; margin-right: 6px; }
+  .icon-btn {
+    width: 32px; height: 32px; padding: 0; border: none; border-radius: 7px; background: none;
+    color: var(--ink-soft); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .icon-btn svg { width: 18px; height: 18px; display: block; }
+  .icon-btn:hover { background: var(--bg); }
+  .icon-btn:disabled { opacity: 0.35; cursor: not-allowed; background: none; }
+  .lib-link {
+    display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+    height: var(--ctl-h); padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg); color: var(--ink-soft); text-decoration: none;
+    transition: border-color .3s ease, color .3s ease, background-color .3s ease;
+  }
+  .lib-link .lib-ic { width: 19px; height: 19px; display: block; flex-shrink: 0; }
+  .lib-link .lib-arrow { width: 9.5px; height: 19px; display: block; flex-shrink: 0; opacity: .65; transition: opacity .3s ease; }
+  /* 평소엔 라벨을 폭 0으로 접어두고, 호버하면 펼치면서 셰브론을 옆으로 밀어낸다 */
+  .lib-link .lib-label {
+    font-family: "Zilla Slab", serif; font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; max-width: 0;
+    transition: max-width .42s cubic-bezier(.4, 0, .2, 1),
+                margin-left .42s cubic-bezier(.4, 0, .2, 1);
+  }
+  .lib-link:hover, .lib-link:focus-visible { background: var(--sofa-accent); border-color: var(--sofa-accent); color: #fff; }
+  .lib-link:hover .lib-arrow, .lib-link:focus-visible .lib-arrow { opacity: 1; }
+  /* 라벨 실제 폭에 맞춰, 버튼이 다 늘어나는 순간 마지막 글자까지 드러난다 */
+  .lib-link:hover .lib-label, .lib-link:focus-visible .lib-label {
+    max-width: 94px; margin-left: 3px;
+    transition: max-width .58s cubic-bezier(.25, .8, .35, 1),
+                margin-left .58s cubic-bezier(.25, .8, .35, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lib-link, .lib-link .lib-label, .lib-link .lib-arrow { transition: none; }
+  }
+  .hdr-search { flex: 1; max-width: 380px; position: relative; }
+  .hdr-search input {
+    width: 100%; height: var(--ctl-h); padding: 0 12px 0 30px; border: 1px solid var(--line); border-radius: 8px;
+    font-size: 13px; font-family: "IBM Plex Sans KR", sans-serif; background: var(--bg); color: var(--ink);
+  }
+  .hdr-search input:focus { outline: none; border-color: var(--accent); }
+  .hdr-search .ico { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; }
+  .hdr-stats { display: flex; gap: 22px; margin-left: auto; }
+  .hdr-stat { text-align: right; }
+  .hdr-stat .n { font-family: "IBM Plex Mono", monospace; font-size: 1.15rem; font-weight: 600; display: block; line-height: 1.1; }
+  .hdr-stat .l { font-size: 9.5px; color: var(--muted); letter-spacing: 0.04em; }
+
+  /* ---- Layout ---- */
+  .layout { flex: 1; display: flex; overflow: hidden; }
+
+  /* ---- Sidebar ---- */
+  .sidebar { width: 210px; flex-shrink: 0; background: var(--paper); border-right: 1px solid var(--line); overflow-y: auto; scrollbar-gutter: stable; padding: 16px 0; }
+  .sb-sec { padding: 0 16px; margin-bottom: 20px; }
+  .sb-lbl { font-family: "IBM Plex Sans KR", sans-serif; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 10px; }
+  .fb {
+    display: flex; align-items: center; width: 100%; text-align: left; padding: 6px 9px; border: none; border-radius: 6px;
+    font-size: 12.5px; font-family: "IBM Plex Sans KR", sans-serif; background: transparent; color: var(--ink-soft); cursor: pointer; margin-bottom: 1px; gap: 6px;
+  }
+  .fb:hover { background: var(--bg); }
+  .fb.on { background: var(--ink); color: var(--paper); font-weight: 600; }
+  #brandAllBtn.on, #brandList .fb.on { background: #e0311c; color: #fff; }
+  #brandAllBtn.on .cnt, #brandList .fb.on .cnt { color: #fff; opacity: 0.85; }
+  .fb .cnt { margin-left: auto; font-size: 10px; opacity: 0.6; font-family: "IBM Plex Mono", monospace; }
+  .fb-cont {
+    display: flex; align-items: center; gap: 5px; width: 100%; text-align: left; border: none; background: transparent;
+    cursor: pointer; padding: 10px 9px 4px; margin-top: 6px;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .fb-cont:first-child { margin-top: 0; }
+  .fb-cont:hover { color: var(--ink-soft); }
+  .fb-cont.on { color: var(--accent); }
+  .fb-cont .cnt { margin-left: auto; font-family: "IBM Plex Mono", monospace; opacity: 0.8; }
+  .fb .chev, .fb-cont .chev { font-size: 9px; width: 10px; flex-shrink: 0; }
+  .fb-sub { padding-left: 18px; }
+  .sb-div { border: none; border-top: 1px solid var(--line); margin: 0 16px 16px; }
+
+  /* ---- Main grid ---- */
+  .main { flex: 1; overflow-y: auto; padding: 18px 20px; }
+
+  /* ---- Scrollbars ---- */
+  .sidebar, .main, .detail { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  .sidebar::-webkit-scrollbar, .main::-webkit-scrollbar, .detail::-webkit-scrollbar { width: 9px; height: 9px; }
+  .sidebar::-webkit-scrollbar-track, .main::-webkit-scrollbar-track, .detail::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb, .main::-webkit-scrollbar-thumb, .detail::-webkit-scrollbar-thumb {
+    background: var(--line); border-radius: 5px; border: 2px solid var(--bg);
+  }
+  .sidebar::-webkit-scrollbar-thumb:hover, .main::-webkit-scrollbar-thumb:hover, .detail::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+  .grid-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+  /* ---- Brand info bar ---- */
+  .brand-info {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 14px; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 12px; padding: 22px 24px; margin-bottom: 18px;
+  }
+  .brand-info .bi-logo-wrap {
+    flex-shrink: 0; width: 190px; height: 76px; border-radius: 9px; background: #fff;
+    display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0 4px;
+  }
+  .brand-info .bi-logo-wrap img { width: 92%; height: 80%; object-fit: contain; display: block; }
+  .brand-info .bi-body { flex: 1; min-width: 0; width: 100%; max-width: 860px; }
+  .brand-info .bi-name { font-family: "Zilla Slab", serif; font-weight: 700; font-size: 1.2rem; margin: 0 0 6px; }
+  .brand-info .bi-summary { font-size: 12.8px; line-height: 1.65; color: var(--ink-soft); margin: 0 0 10px; }
+  .brand-info .bi-facts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .brand-info .bi-fact { font-size: 11.5px; color: var(--ink-soft); }
+  .brand-info .bi-fact b { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px; font-weight: 600; }
+  .bi-actions { display: flex; align-items: center; gap: 14px; }
+  .bi-detail-btn {
+    font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: none;
+    border-radius: 7px; padding: 7px 14px; cursor: pointer;
+  }
+  .bi-detail-btn:hover { background: var(--tag-bg); }
+  .bi-source-link { font-size: 11.5px; color: var(--muted); text-decoration: underline; }
+  .bi-source-link:hover { color: var(--ink-soft); }
+  .bi-home-btn {
+    font-size: 12px; font-weight: 600; color: var(--ink-soft); background: none; border: 1px solid var(--line);
+    border-radius: 7px; padding: 6px 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .bi-home-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .bi-logo-row { display: flex; flex-direction: column; align-items: stretch; gap: 8px; flex-shrink: 0; }
+  .bi-logo-row .bi-home-btn { justify-content: center; }
+
+  /* ---- Brand detail (Confluence content) view ---- */
+  .brand-doc { max-width: 860px; margin: 0; padding-left: 25px; }
+  .brand-doc-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .brand-doc-back {
+    font-size: 12px; font-weight: 600; color: var(--ink-soft); background: var(--panel); border: 1px solid var(--line);
+    border-radius: 7px; padding: 7px 13px; cursor: pointer; flex-shrink: 0;
+  }
+  .brand-doc-back:hover { background: var(--bg); }
+  .brand-doc-body {
+    font-size: 13.5px; line-height: 1.75; color: var(--ink-soft);
+  }
+  .brand-doc-body h3 { font-family: "Zilla Slab", serif; color: var(--accent); font-size: 1.05rem; margin: 26px 0 12px; }
+  .brand-doc-body h3:first-child { margin-top: 0; }
+  .brand-doc-body p { margin: 0 0 12px; }
+  .brand-doc-body strong { color: var(--ink); }
+  .brand-doc-body ul { margin: 0 0 14px; padding-left: 20px; }
+  .brand-doc-body li { margin-bottom: 5px; }
+  .brand-doc-body hr { border: none; border-top: 1px solid var(--line); margin: 22px 0; }
+  .brand-doc-body a { color: var(--accent); }
+  .brand-doc-body figure { display: none; }
+  .brand-doc-body .bd-img { margin: 10px 0 18px; }
+  .brand-doc-body .bd-img img { max-width: 300px; width: 100%; display: block; border-radius: 8px; background: #ddd7c9; }
+  .masonry { column-count: 4; column-gap: 16px; }
+  @media (max-width: 1500px) { .masonry { column-count: 3; } }
+  @media (max-width: 1100px) { .masonry { column-count: 2; } }
+  @media (max-width: 720px) { .masonry { column-count: 2; column-gap: 10px; } }
+  @media (max-width: 380px) { .masonry { column-count: 2; column-gap: 8px; } }
+
+  .card {
+    break-inside: avoid; margin-bottom: 16px; background: var(--paper);
+    border: 1.5px solid transparent; border-radius: 10px; overflow: hidden;
+    cursor: pointer; transition: border-color .15s, box-shadow .15s;
+  }
+  .card:hover { box-shadow: 0 8px 20px rgba(36,31,25,0.1); }
+  .card.sel { border-color: var(--ink); }
+  .card .imgwrap { position: relative; background: #ddd7c9; }
+  .card img.pimg { width: 100%; display: block; }
+  .card .logochip {
+    position: absolute; left: 9px; top: 9px; background: rgba(246,243,236,0.92);
+    border-radius: 6px; padding: 4px 8px; display: flex; align-items: center; height: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15); cursor: pointer;
+  }
+  .card .logochip:hover { background: rgba(255,255,255,0.98); box-shadow: 0 1px 5px rgba(0,0,0,0.28); }
+  .card .logochip img { max-height: 14px; max-width: 70px; display: block; }
+  .card .logochip[data-brand="ki"] { height: 26px; padding: 3px 8px; }
+  .card .logochip[data-brand="ki"] img { max-height: 20px; max-width: 84px; }
+  .card .logochip[data-brand="sitzone"] { height: 28px; padding: 3px 8px; }
+  .card .logochip[data-brand="sitzone"] img { max-height: 22px; max-width: 84px; }
+  .card .logochip[data-brand="sidiz"] { height: 26px; padding: 3px 8px; }
+  .card .logochip[data-brand="sidiz"] img { max-height: 20px; max-width: 84px; }
+  .card .logochip[data-brand="livart"] { height: 24px; padding: 3px 8px; }
+  .card .logochip[data-brand="livart"] img { max-height: 18px; max-width: 84px; }
+  .card .logochip.textonly { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink); }
+  .copy-btn {
+    position: absolute; top: 9px; right: 9px; width: 26px; height: 26px; border-radius: 7px; border: none;
+    background: rgba(36,31,25,0.55); color: #fff; font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s, background .15s; z-index: 2;
+  }
+  .imgwrap:hover .copy-btn, .det-img:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: rgba(36,31,25,0.85); }
+  .copy-btn.copied { opacity: 1; background: #4a7a52; }
+  .copy-btn svg { width: 13px; height: 13px; display: block; }
+  .card .body { padding: 12px 14px 13px; }
+  .card .pname { font-family: "Zilla Slab", serif; font-weight: 600; font-size: 1rem; margin: 0 0 3px; text-wrap: balance; }
+  .card .brandname { font-size: 11px; color: var(--muted); margin: 0 0 8px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .tag { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: 0.02em; padding: 2px 7px; border-radius: 3px; background: var(--tag-bg); color: var(--tag-ink); }
+  .tag.cont-north-america { background: var(--na-bg); color: var(--na); }
+  .tag.cont-europe { background: var(--eu-bg); color: var(--eu); }
+  .tag.cont-asia { background: var(--as-bg); color: var(--as); }
+  .card .price { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  .state { text-align: center; padding: 70px 20px; color: var(--muted); }
+  .state .ico { font-size: 32px; margin-bottom: 10px; }
+
+  /* ---- Detail panel (persistent, right side) ---- */
+  .detail { width: 360px; flex-shrink: 0; background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; display: flex; flex-direction: column; }
+  .detail.hide { display: none; }
+  .det-hdr { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 10px; }
+  .det-hdr-info { flex: 1; min-width: 0; }
+  .det-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+  .det-brand-row:hover .det-brand { text-decoration: underline; }
+  .det-logo { max-height: 15px; max-width: 90px; }
+  .det-logo[data-brand="ki"] { max-height: 22px; }
+  .det-logo[data-brand="sitzone"] { max-height: 24px; }
+  .det-logo[data-brand="sidiz"] { max-height: 22px; }
+  .det-logo[data-brand="livart"] { max-height: 20px; }
+  .det-brand { font-size: 11.5px; color: var(--muted); }
+  .det-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--muted); line-height: 1; flex-shrink: 0; padding: 2px; }
+  .det-close:hover { color: var(--ink); }
+  .det-img { position: relative; background: #ddd7c9; flex-shrink: 0; overflow: hidden; cursor: zoom-in; }
+  .det-img img { width: 100%; height: auto; display: block; }
+  .gal-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: rgba(36,31,25,0.5); color: #fff; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s, background .15s; z-index: 3;
+  }
+  .gal-arrow:hover { background: rgba(36,31,25,0.8); }
+  .det-img:hover .gal-arrow { opacity: 1; }
+  .gal-arrow.prev { left: 8px; }
+  .gal-arrow.next { right: 8px; }
+  .gal-dots { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 10px 0; background: var(--panel); }
+  .gal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); border: none; cursor: pointer; padding: 0; }
+  .gal-dot.on { background: var(--ink); width: 7px; height: 7px; }
+  .det-body { padding: 18px; flex: 1; }
+  .det-name { font-family: "Zilla Slab", serif; font-size: 1.4rem; font-weight: 600; margin: 0 0 10px; text-wrap: balance; }
+  .det-desc { color: var(--ink-soft); line-height: 1.6; margin-bottom: 16px; font-size: 13px; }
+  .det-props { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+  .det-row { display: flex; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .det-key { font-size: 11px; color: var(--muted); width: 76px; flex-shrink: 0; padding-top: 1px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.03em; }
+  .det-val { font-size: 13px; color: var(--ink); flex: 1; line-height: 1.5; }
+  .det-acts { padding: 16px 18px; border-top: 1px solid var(--line); flex-shrink: 0; }
+  .det-link { display: block; text-align: center; font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); padding: 11px 18px; border-radius: 7px; text-decoration: none; }
+
+  .cf-dd { position: relative; display: block; width: 100%; }
+  .cf-trigger {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%;
+    font: inherit; font-size: 13px; line-height: 1.5; color: var(--ink); background: none;
+    border: none; padding: 0; margin: 0; cursor: pointer; text-align: left;
+  }
+  .cf-trigger:hover, .cf-dd.open .cf-trigger { color: var(--accent); }
+  .cf-trigger:focus { outline: none; }
+  .cf-trigger:focus-visible .cf-trigger-txt { text-decoration: underline; }
+  .cf-trigger svg { width: 8px; height: 8px; flex-shrink: 0; stroke: currentColor; opacity: 0.75; transition: transform .15s; }
+  .cf-dd.open .cf-trigger svg { transform: rotate(180deg); }
+  .cf-menu {
+    position: absolute; top: calc(100% + 5px); left: 0; min-width: 150px; max-width: 240px;
+    max-height: 230px; overflow-y: auto; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 9px; box-shadow: 0 10px 28px rgba(36,31,25,0.18); padding: 4px; z-index: 30;
+  }
+  .cf-menu[hidden] { display: none; }
+  .cf-opt {
+    display: block; width: 100%; text-align: left; font: inherit; font-size: 12.5px; color: var(--ink-soft);
+    background: none; border: none; border-radius: 6px; padding: 6px 9px; cursor: pointer;
+  }
+  .cf-opt:hover { background: var(--bg); color: var(--ink); }
+  .cf-opt.sel { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  .tax-gear {
+    background: none; border: none; cursor: pointer; font-size: 12px; color: var(--muted);
+    margin-left: 4px; padding: 0; vertical-align: middle;
+  }
+  .tax-gear:hover { color: var(--accent); }
+  .tax-modal-bg {
+    position: fixed; inset: 0; background: rgba(20,17,13,0.55); display: none;
+    align-items: center; justify-content: center; z-index: 320; padding: 20px;
+  }
+  .tax-modal-bg.open { display: flex; }
+  .tax-modal {
+    background: var(--paper); border-radius: 12px; width: 100%; max-width: 560px;
+    max-height: 84vh; overflow-y: auto; padding: 20px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .tax-modal-hdr { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .tax-modal-sub { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+  .tax-modal-body { display: flex; gap: 20px; flex-wrap: wrap; }
+  .tax-col { flex: 1 1 200px; min-width: 180px; }
+  .tax-col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin-bottom: 8px; }
+  .tax-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 6px 4px 6px 10px; border-bottom: 1px solid var(--line); font-size: 13px;
+  }
+  .tax-item button {
+    background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; line-height: 1; padding: 2px 4px;
+  }
+  .tax-item button:hover { color: #b33; }
+  .tax-add-row { display: flex; gap: 6px; margin-top: 10px; }
+  .tax-add-row input {
+    flex: 1; font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--bg); color: var(--ink);
+  }
+  .tax-add-row input:focus { outline: none; border-color: var(--accent); }
+  .tax-add-row button {
+    font-size: 12px; font-weight: 600; color: #fff; background: var(--accent); border: none;
+    border-radius: 6px; padding: 0 14px; cursor: pointer;
+  }
+  .tax-modal-note { font-size: 11.5px; color: var(--muted); margin: 16px 0 0; line-height: 1.5; }
+  .det-empty { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--muted); padding: 30px; text-align: center; }
+  .det-empty .ico { font-size: 28px; margin-bottom: 10px; }
+
+  /* ---- Lightbox ---- */
+  .lightbox-bg { position: fixed; inset: 0; background: rgba(20,17,13,0.9); display: none; align-items: center; justify-content: center; z-index: 300; cursor: zoom-out; }
+  .lightbox-bg.open { display: flex; }
+  .lightbox-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 90vw; }
+  .lightbox-bg img { max-width: 88vw; max-height: 74vh; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+  .lightbox-close { position: fixed; top: 20px; right: 24px; background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; opacity: 0.85; z-index: 301; }
+  .lightbox-close:hover { opacity: 1; }
+  .lightbox-nav { background: rgba(255,255,255,0.12); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+  .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+  .lightbox-row { display: flex; align-items: center; gap: 18px; }
+  .lightbox-copy { width: 36px; height: 36px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .lightbox-copy:hover { background: rgba(255,255,255,0.3); }
+  .lightbox-copy.copied { background: #4a7a52; }
+  .lightbox-copy svg { width: 15px; height: 15px; }
+
+  /* ---- Mobile ---- */
+  .hdr-menu-btn { display: none; }
+  .sidebar-backdrop { display: none; }
+  @media (max-width: 860px) {
+    .hdr { padding: 0 8px; gap: 4px; height: 52px; }
+    .hdr-menu-btn { display: flex; }
+    .hdr-brand { gap: 0; }
+    .hdr-brand .icon-btn { width: 30px; height: 30px; }
+    .hdr-search { max-width: none; }
+    .hdr-search input { padding: 8px 8px 8px 26px; }
+    .hdr-stats { gap: 12px; }
+    .hdr-stat .n { font-size: 0.95rem; }
+    .hdr-stat .l { font-size: 8px; }
+
+    /* touch devices have no :hover, so these controls must stay visible instead of only appearing on hover */
+    .copy-btn, .gal-arrow { opacity: 1; }
+
+    .sidebar {
+      position: fixed; top: 52px; bottom: 0; left: -84%; width: 84%; max-width: 300px;
+      z-index: 250; transition: left .22s ease; box-shadow: 3px 0 24px rgba(0,0,0,0.2);
+    }
+    .sidebar.open { left: 0; }
+    .sidebar-backdrop.show {
+      display: block; position: fixed; top: 52px; left: 0; right: 0; bottom: 0;
+      background: rgba(20,17,13,0.4); z-index: 240;
+    }
+
+    .main { padding: 14px 12px; }
+    .card .body { padding: 9px 10px 10px; }
+    .card .pname { font-size: 0.88rem; }
+    .card .brandname { font-size: 10px; margin-bottom: 6px; }
+    .tag { font-size: 8.5px; padding: 2px 5px; }
+    .card .price { font-size: 11px; }
+    .card .logochip { padding: 3px 6px; height: 17px; left: 7px; top: 7px; }
+    .card .logochip img { max-height: 11px; max-width: 56px; }
+    .copy-btn { width: 22px; height: 22px; top: 7px; right: 7px; }
+    .copy-btn svg { width: 11px; height: 11px; }
+    .brand-info { flex-direction: column; padding: 16px; }
+    .brand-info .bi-logo-wrap { width: 140px; height: 56px; }
+    .bi-logo-row { flex-direction: row; align-items: center; }
+
+    .detail {
+      position: fixed; top: 52px; left: 0; right: 0; bottom: 0; width: 100%;
+      z-index: 260; border-left: none;
+    }
+    .det-name { font-size: 1.2rem; }
+    .lightbox-close { top: 12px; right: 12px; }
+  }
+  @media (max-width: 480px) {
+    .hdr-stats { display: none; }
+    .hdr-search { flex: 1; }
+  }
+</style>
+
+<div class="hdr">
+  <div class="hdr-brand">
+    <button class="icon-btn hdr-menu-btn" id="btnMenu" onclick="toggleSidebar()" title="메뉴"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <span class="hdr-title" onclick="goHome()" title="홈" style="cursor:pointer">Chair Library</span>
+    <button class="icon-btn" id="btnBack" onclick="goBack()" title="뒤로가기" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M20 4 L4 12 L20 20 Z"/></svg></button>
+    <button class="icon-btn" id="btnForward" onclick="goForward()" title="앞으로 가기" disabled style="margin-left:-6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4 L20 12 L4 20 Z"/></svg></button>
+  </div>
+  <div class="hdr-search">
+    <span class="ico">&#8981;</span>
+    <input type="search" id="searchInp" placeholder="제품명, 브랜드 검색...">
+  </div>
+  <a class="lib-link" href="https://jaeyoungkim-jay.github.io/furniture-library-images/sofa-library.html" target="_blank" rel="noopener" title="Sofa Library 열기">
+    <svg class="lib-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6"/><path d="M3 16.3V11.5a1.5 1.5 0 0 1 3 0V14h12v-2.5a1.5 1.5 0 0 1 3 0v4.8a1.2 1.2 0 0 1-1.2 1.2H4.2A1.2 1.2 0 0 1 3 16.3Z"/><path d="M5 17.5V20M19 17.5V20"/></svg>
+    <span class="lib-label">Sofa Library</span>
+    <svg class="lib-arrow" viewBox="0 0 12 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4 9.5 12l-7 8"/></svg>
+  </a>
+  <div class="hdr-stats">
+    <div class="hdr-stat"><span class="n" id="brandCount"></span><span class="l">BRANDS</span></div>
+    <div class="hdr-stat"><span class="n" id="productCount"></span><span class="l">PRODUCTS</span></div>
+  </div>
+</div>
+
+<div class="lightbox-bg" id="lightboxBg" onclick="if(event.target===this) closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <div class="lightbox-inner">
+    <div class="lightbox-row">
+      <button class="lightbox-nav" id="lbPrev" onclick="lbStep(-1)" style="display:none">&#8249;</button>
+      <img id="lightboxImg" src="" alt="">
+      <button class="lightbox-nav" id="lbNext" onclick="lbStep(1)" style="display:none">&#8250;</button>
+    </div>
+    <button class="lightbox-copy" id="lbCopy" onclick="copyImage(lbImages[lbIndex], this)" title="이미지 복사">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M4 16V4a2 2 0 0 1 2-2h10"></path></svg>
+    </button>
+  </div>
+</div>
+
+<div class="tax-modal-bg" id="taxModalBg" onclick="if(event.target===this) closeTaxModal()">
+  <div class="tax-modal">
+    <div class="tax-modal-hdr">
+      <span>분류 기준 관리</span>
+      <button class="det-close" onclick="closeTaxModal()">&times;</button>
+    </div>
+    <p class="tax-modal-sub" id="taxModalSub"></p>
+    <div class="tax-modal-body">
+      <div class="tax-col">
+        <div class="tax-col-title">Category</div>
+        <div id="taxCatItems"></div>
+        <div class="tax-add-row">
+          <input type="text" id="taxCatInput" placeholder="새 카테고리 이름">
+          <button onclick="addTaxItem('category')">추가</button>
+        </div>
+      </div>
+      <div class="tax-col">
+        <div class="tax-col-title">Type (소재)</div>
+        <div id="taxTypeItems"></div>
+        <div class="tax-add-row">
+          <input type="text" id="taxTypeInput" placeholder="새 소재 이름">
+          <button onclick="addTaxItem('type')">추가</button>
+        </div>
+      </div>
+    </div>
+    <p class="tax-modal-note">목록에서 삭제해도 이미 그 값으로 지정된 제품 표시는 바뀌지 않습니다 — 새로 분류할 때 선택 목록에서만 빠집니다.</p>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-sec">
+      <div class="sb-lbl">Year</div>
+      <button class="fb-cont" id="yearAllBtn"></button>
+      <div id="yearList"></div>
+    </div>
+    <hr class="sb-div">
+    <div class="sb-sec">
+      <div class="sb-lbl">Brand</div>
+      <button class="fb on" id="brandAllBtn">All</button>
+      <div id="brandList"></div>
+    </div>
+    <hr class="sb-div">
+    <div class="sb-sec">
+      <div class="sb-lbl">Category <button class="tax-gear" id="taxGearBtn" onclick="openTaxModal()" title="분류 기준 관리">&#9881;</button></div>
+      <button class="fb on" id="catAllBtn">All <span class="cnt" id="cnt-cat-all"></span></button>
+      <div id="catList"></div>
+    </div>
+    <hr class="sb-div">
+    <div class="sb-sec">
+      <div class="sb-lbl">Type</div>
+      <button class="fb on" id="typeAllBtn">All <span class="cnt" id="cnt-type-all"></span></button>
+      <div id="typeList"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div id="brandInfoWrap"></div>
+    <div id="mainGridView">
+      <div class="grid-meta" id="gridMeta"></div>
+      <div class="masonry" id="grid"></div>
+    </div>
+    <div id="brandDocView" style="display:none"></div>
+  </main>
+
+  <aside class="detail hide" id="detail">
+    <div class="det-empty" id="detEmpty">
+      <div class="ico">&#129681;</div>
+      <p>카드를 선택하면<br>여기에 상세 정보가 표시됩니다.</p>
+    </div>
+    <div id="detFilled" style="display:none; flex-direction:column; height:100%">
+      <div class="det-hdr">
+        <div class="det-hdr-info">
+          <div class="det-brand-row" id="dBrandRow" style="cursor:pointer">
+            <img class="det-logo" id="dLogo" src="" alt="" style="display:none">
+            <span class="det-brand" id="dBrand"></span>
+          </div>
+        </div>
+        <button class="det-close" onclick="closeDetail()">&times;</button>
+      </div>
+      <div class="det-img" id="dImgWrap" onclick="openLightbox()">
+        <img id="dImg" src="" alt="">
+        <button class="copy-btn" id="dCopyBtn" title="이미지 복사" onclick="event.stopPropagation(); copyImage(selected.images[detIndex], this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M4 16V4a2 2 0 0 1 2-2h10"></path></svg>
+        </button>
+        <button class="gal-arrow prev" id="dPrev" onclick="event.stopPropagation(); detStep(-1)" style="display:none">&#8249;</button>
+        <button class="gal-arrow next" id="dNext" onclick="event.stopPropagation(); detStep(1)" style="display:none">&#8250;</button>
+      </div>
+      <div class="gal-dots" id="dDots"></div>
+      <div class="det-body">
+        <p class="det-name" id="dName"></p>
+        <p class="det-desc" id="dDesc"></p>
+        <div class="det-props">
+          <div class="det-row" id="dPriceRow"><span class="det-key">Price</span><span class="det-val" id="dPrice"></span></div>
+          <div class="det-row"><span class="det-key">Year</span><span class="det-val" id="dYear"></span></div>
+          <div class="det-row"><span class="det-key">Category</span><span class="det-val" id="dCategory"></span></div>
+          <div class="det-row"><span class="det-key">Type</span><span class="det-val" id="dType"></span></div>
+          <div class="det-row"><span class="det-key">Material</span><span class="det-val" id="dMaterial"></span></div>
+          <div class="det-row"><span class="det-key">Base</span><span class="det-val" id="dBase"></span></div>
+          <div class="det-row"><span class="det-key">Designer</span><span class="det-val" id="dDesigner"></span></div>
+        </div>
+      </div>
+      <div class="det-acts">
+        <a class="det-link" id="dLink" href="#" target="_blank" rel="noopener">제품 페이지 보기</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>window.CHAIR_IMAGE_BASE = "https://raw.githubusercontent.com/jaeyoungkim-jay/chair-market-watch-images/main/";</script>
+<script src="scripts/data-transform.js"></script>
+<script>
+  // 데이터는 HTML 에 넣지 않고 페이지가 열릴 때 JSON 파일에서 불러온다(boot 참고).
+  let DATA = [], BRANDS = [], CATEGORIES = [], YEAR_BUCKETS = [], TYPES = [], BRAND_HISTORY = {}, BRAND_MISC = {};
+  const contLabel = { "north-america": "North America", "europe": "Europe", "asia": "Asia" };
+
+  const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M4 16V4a2 2 0 0 1 2-2h10"></path></svg>';
+
+  let state = { cont: "all", cat: new Set(), type: new Set(), brand: "all", year: "all", q: "" };
+  let expanded = new Set();
+  let yearListOpen = false;
+  let selected = null;
+  let brandDocOpen = false;
+  let detIndex = 0;
+  let navStack = [{ type: "home" }];
+  let navIndex = 0;
+  let lbImages = [];
+  let lbIndex = 0;
+
+  // ---- 분류 기준 편집 (Claude Artifact의 공유 db 기능) ----
+  let dbApi = null;
+  let overridesMap = {};   // pid -> { category?, type?, updatedAt? }
+  let taxCategories = [];
+  let taxTypes = [];
+
+  function effCat(p) { const o = overridesMap[p.pid]; return (o && o.category) || p.category; }
+  function effType(p) { const o = overridesMap[p.pid]; return (o && o.type) || p.type; }
+
+  async function initClassifyDb() {
+    if (typeof claude === "undefined" || !claude.use) return;
+    try { dbApi = await claude.use("db"); } catch (e) { dbApi = null; }
+    if (!dbApi) return;
+    dbApi.collection("overrides").onSnapshot((snap) => {
+      const next = {};
+      snap.docs.forEach((d) => { next[d.id] = d.data() || {}; });
+      overridesMap = next;
+      refresh();
+      if (selected) {
+        renderClassifyRow("dCategory", "category", selected, taxCategories);
+        renderClassifyRow("dType", "type", selected, taxTypes);
+      }
+    }, (err) => console.warn("overrides subscribe failed", err));
+    dbApi.doc("taxonomy/categories").onSnapshot((snap) => {
+      const d = snap.data();
+      taxCategories = (d && Array.isArray(d.items) && d.items.length) ? d.items : CATEGORIES.slice();
+      renderTaxonomyPanel();
+      renderCatList();
+      if (selected) renderClassifyRow("dCategory", "category", selected, taxCategories);
+    }, (err) => console.warn("taxonomy/categories subscribe failed", err));
+    dbApi.doc("taxonomy/types").onSnapshot((snap) => {
+      const d = snap.data();
+      taxTypes = (d && Array.isArray(d.items) && d.items.length) ? d.items : TYPES.slice();
+      renderTaxonomyPanel();
+      renderTypeList();
+      if (selected) renderClassifyRow("dType", "type", selected, taxTypes);
+    }, (err) => console.warn("taxonomy/types subscribe failed", err));
+  }
+
+  async function setOverride(p, field, val) {
+    if (!dbApi) return;
+    const merged = Object.assign({}, overridesMap[p.pid]);
+    merged[field] = val || null;
+    merged.updatedAt = Date.now();
+    overridesMap[p.pid] = merged;
+    refresh();
+    renderClassifyRow("dCategory", "category", p, taxCategories);
+    renderClassifyRow("dType", "type", p, taxTypes);
+    try {
+      await dbApi.doc("overrides/" + p.pid).set(merged);
+    } catch (e) { console.warn("override write failed", e); }
+  }
+
+  function closeAllCfMenus(except) {
+    document.querySelectorAll(".cf-dd.open").forEach((dd) => {
+      if (dd !== except) { dd.classList.remove("open"); dd.querySelector(".cf-menu").hidden = true; }
+    });
+  }
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".cf-dd")) closeAllCfMenus();
+  });
+
+  function renderClassifyRow(elId, field, p, taxList) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const original = p[field];
+    const ov = overridesMap[p.pid] || {};
+    const effective = ov[field] || original || "";
+    if (dbApi) {
+      let list = taxList.slice();
+      if (effective && !list.includes(effective)) list = [effective].concat(list);
+      const dd = document.createElement("div");
+      dd.className = "cf-dd";
+      const trigger = document.createElement("button");
+      trigger.type = "button";
+      trigger.className = "cf-trigger";
+      trigger.innerHTML = `<span class="cf-trigger-txt">${effective || "미상"}</span><svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      const menu = document.createElement("div");
+      menu.className = "cf-menu";
+      menu.hidden = true;
+      list.forEach((v) => {
+        const opt = document.createElement("button");
+        opt.type = "button";
+        opt.className = "cf-opt" + (v === effective ? " sel" : "");
+        opt.textContent = v;
+        opt.addEventListener("click", (e) => {
+          e.stopPropagation();
+          closeAllCfMenus();
+          dd.classList.remove("open");
+          menu.hidden = true;
+          setOverride(p, field, v);
+        });
+        menu.appendChild(opt);
+      });
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = dd.classList.contains("open");
+        closeAllCfMenus(dd);
+        dd.classList.toggle("open", !isOpen);
+        menu.hidden = isOpen;
+      });
+      dd.appendChild(trigger);
+      dd.appendChild(menu);
+      el.innerHTML = "";
+      el.appendChild(dd);
+    } else {
+      el.textContent = effective || "—";
+    }
+  }
+
+  function renderTaxonomyPanel() {
+    const catWrap = document.getElementById("taxCatItems");
+    const typeWrap = document.getElementById("taxTypeItems");
+    if (!catWrap || !typeWrap) return;
+    document.getElementById("taxModalSub").textContent = dbApi
+      ? "여기서 추가/삭제한 목록은 실시간으로 모든 보는 사람에게 반영됩니다."
+      : "이 화면(로컬 파일/GitHub Pages)에서는 목록을 볼 수만 있어요 — 수정은 Claude Artifact 링크에서 가능합니다.";
+    catWrap.innerHTML = "";
+    taxCategories.forEach((v) => {
+      const row = document.createElement("div");
+      row.className = "tax-item";
+      const span = document.createElement("span"); span.textContent = v;
+      row.appendChild(span);
+      if (dbApi) {
+        const btn = document.createElement("button");
+        btn.textContent = "×"; btn.title = "삭제";
+        btn.onclick = () => removeTaxItem("category", v);
+        row.appendChild(btn);
+      }
+      catWrap.appendChild(row);
+    });
+    typeWrap.innerHTML = "";
+    taxTypes.forEach((v) => {
+      const row = document.createElement("div");
+      row.className = "tax-item";
+      const span = document.createElement("span"); span.textContent = v;
+      row.appendChild(span);
+      if (dbApi) {
+        const btn = document.createElement("button");
+        btn.textContent = "×"; btn.title = "삭제";
+        btn.onclick = () => removeTaxItem("type", v);
+        row.appendChild(btn);
+      }
+      typeWrap.appendChild(row);
+    });
+    document.querySelectorAll(".tax-add-row input, .tax-add-row button").forEach((el) => { el.disabled = !dbApi; });
+  }
+
+  function openTaxModal() { renderTaxonomyPanel(); document.getElementById("taxModalBg").classList.add("open"); }
+  function closeTaxModal() { document.getElementById("taxModalBg").classList.remove("open"); }
+
+  async function addTaxItem(kind) {
+    if (!dbApi) return;
+    const inputEl = document.getElementById(kind === "category" ? "taxCatInput" : "taxTypeInput");
+    const val = inputEl.value.trim();
+    if (!val) return;
+    const list = kind === "category" ? taxCategories : taxTypes;
+    if (list.includes(val)) { inputEl.value = ""; return; }
+    const next = list.concat([val]);
+    inputEl.value = "";
+    try {
+      await dbApi.doc("taxonomy/" + (kind === "category" ? "categories" : "types")).set({ items: next });
+    } catch (e) { console.warn("taxonomy add failed", e); }
+  }
+
+  async function removeTaxItem(kind, val) {
+    if (!dbApi) return;
+    if (!confirm(`"${val}"을(를) 목록에서 삭제할까요? 이미 지정된 제품 표시에는 영향 없습니다.`)) return;
+    const list = kind === "category" ? taxCategories : taxTypes;
+    const next = list.filter((v) => v !== val);
+    try {
+      await dbApi.doc("taxonomy/" + (kind === "category" ? "categories" : "types")).set({ items: next });
+    } catch (e) { console.warn("taxonomy remove failed", e); }
+  }
+
+  function toPngBlob(srcBlob) {
+    return new Promise((resolve, reject) => {
+      if (srcBlob.type === "image/png") { resolve(srcBlob); return; }
+      const url = URL.createObjectURL(srcBlob);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        canvas.toBlob((pngBlob) => {
+          URL.revokeObjectURL(url);
+          if (pngBlob) resolve(pngBlob); else reject(new Error("PNG 변환 실패"));
+        }, "image/png");
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지 로드 실패")); };
+      img.src = url;
+    });
+  }
+
+  async function copyImage(dataUri, btn) {
+    if (!dataUri) return;
+    try {
+      const res = await fetch(dataUri);
+      const srcBlob = await res.blob();
+      // Chrome's Clipboard API only reliably accepts image/png for ClipboardItem —
+      // writing the source jpeg/webp blob type directly fails silently, leaving
+      // whatever was previously on the clipboard in place.
+      const pngBlob = await toPngBlob(srcBlob);
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
+      btn.classList.add("copied");
+      setTimeout(() => btn.classList.remove("copied"), 1200);
+    } catch (e) {
+      console.warn("copy failed", e);
+    }
+  }
+
+  function openLightbox() {
+    if (!selected || !selected.images.length) return;
+    lbImages = selected.images;
+    lbIndex = detIndex;
+    showLightboxImg();
+    document.getElementById("lightboxBg").classList.add("open");
+  }
+  function closeLightbox() { document.getElementById("lightboxBg").classList.remove("open"); }
+  function showLightboxImg() {
+    document.getElementById("lightboxImg").src = lbImages[lbIndex];
+    document.getElementById("lbPrev").style.display = lbImages.length > 1 ? "block" : "none";
+    document.getElementById("lbNext").style.display = lbImages.length > 1 ? "block" : "none";
+  }
+  function lbStep(dir) {
+    lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+    showLightboxImg();
+  }
+  document.addEventListener("keydown", (e) => {
+    if (!document.getElementById("lightboxBg").classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") lbStep(-1);
+    if (e.key === "ArrowRight") lbStep(1);
+  });
+
+  function renderDots() {
+    const dots = document.getElementById("dDots");
+    dots.innerHTML = "";
+    const multi = selected && selected.images.length > 1;
+    document.getElementById("dPrev").style.display = multi ? "flex" : "none";
+    document.getElementById("dNext").style.display = multi ? "flex" : "none";
+    dots.style.display = multi ? "flex" : "none";
+    if (!multi) return;
+    selected.images.forEach((img, i) => {
+      const d = document.createElement("button");
+      d.className = "gal-dot" + (i === detIndex ? " on" : "");
+      d.onclick = (e) => { e.stopPropagation(); detGoTo(i); };
+      dots.appendChild(d);
+    });
+  }
+  function detGoTo(i) {
+    detIndex = i;
+    document.getElementById("dImg").src = selected.images[detIndex];
+    renderDots();
+  }
+  function detStep(dir) {
+    detGoTo((detIndex + dir + selected.images.length) % selected.images.length);
+  }
+
+  function renderYearList() {
+    const wrap = document.getElementById("yearList");
+    wrap.innerHTML = "";
+    const allBtn = document.getElementById("yearAllBtn");
+    allBtn.className = "fb" + (state.year === "all" ? " on" : "");
+    const allCnt = DATA.filter(p => matchFilters(p, { year: "all" })).length;
+    allBtn.innerHTML = `<span class="chev">${yearListOpen ? "&#9662;" : "&#9656;"}</span><span>All</span><span class="cnt">${allCnt}</span>`;
+    allBtn.onclick = () => {
+      if (state.year !== "all") { state.year = "all"; yearListOpen = true; refresh(); return; }
+      yearListOpen = !yearListOpen;
+      renderYearList();
+    };
+    if (!yearListOpen) return;
+    YEAR_BUCKETS.forEach(yb => {
+      const cnt = DATA.filter(p => matchFilters(p, { year: yb.key })).length;
+      if (!cnt) return;
+      const btn = document.createElement("button");
+      btn.className = "fb fb-sub" + (state.year === yb.key ? " on" : "");
+      btn.innerHTML = yb.label + ` <span class="cnt">${cnt}</span>`;
+      btn.onclick = () => { state.year = state.year === yb.key ? "all" : yb.key; refresh(); };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderCatList() {
+    const wrap = document.getElementById("catList");
+    wrap.innerHTML = "";
+    document.getElementById("catAllBtn").classList.toggle("on", state.cat.size === 0);
+    document.getElementById("cnt-cat-all").textContent = DATA.filter(p => matchFilters(p, { cat: "all" })).length;
+    taxCategories.forEach(cat => {
+      const cnt = DATA.filter(p => matchFilters(p, { cat: cat })).length;
+      const btn = document.createElement("button");
+      btn.className = "fb" + (state.cat.has(cat) ? " on" : "");
+      btn.innerHTML = cat + ` <span class="cnt">${cnt}</span>`;
+      btn.onclick = () => { if (state.cat.has(cat)) state.cat.delete(cat); else state.cat.add(cat); refresh(); };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderTypeList() {
+    const wrap = document.getElementById("typeList");
+    wrap.innerHTML = "";
+    document.getElementById("typeAllBtn").classList.toggle("on", state.type.size === 0);
+    document.getElementById("cnt-type-all").textContent = DATA.filter(p => matchFilters(p, { type: "all" })).length;
+    taxTypes.forEach(t => {
+      const cnt = DATA.filter(p => matchFilters(p, { type: t })).length;
+      const btn = document.createElement("button");
+      btn.className = "fb" + (state.type.has(t) ? " on" : "");
+      btn.innerHTML = t + ` <span class="cnt">${cnt}</span>`;
+      btn.onclick = () => { if (state.type.has(t)) state.type.delete(t); else state.type.add(t); refresh(); };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderBrandList() {
+    const wrap = document.getElementById("brandList");
+    wrap.innerHTML = "";
+    ["north-america", "europe", "asia"].forEach(cont => {
+      const brandsInCont = BRANDS.filter(b => b[2] === cont);
+      if (!brandsInCont.length) return;
+
+      // 지역 줄은 브랜드 수, 그 아래 브랜드 줄은 제품 수를 보여 준다.
+      // 지금 필터에 걸리는 제품이 하나도 없는 브랜드는 줄도 숫자도 빼서 둘이 어긋나지 않게 한다.
+      const liveBrands = brandsInCont.filter(
+        b => DATA.some(p => matchFilters(p, { brand: b[0], cont: "all" })));
+      if (!liveBrands.length) return;
+
+      const isOpen = expanded.has(cont);
+      const header = document.createElement("button");
+      header.className = "fb-cont" + (state.brand !== "all" && state.cont === cont ? " on" : "");
+      header.innerHTML = `<span class="chev">${isOpen ? "&#9662;" : "&#9656;"}</span><span>${contLabel[cont]}</span><span class="cnt">${liveBrands.length}</span>`;
+      header.onclick = () => {
+        if (isOpen) expanded.delete(cont); else expanded.add(cont);
+        renderBrandList();
+      };
+      wrap.appendChild(header);
+      if (!isOpen) return;
+
+      liveBrands.forEach(b => {
+        const btn = document.createElement("button");
+        btn.className = "fb fb-sub" + (state.brand === b[0] ? " on" : "");
+        const cnt = DATA.filter(p => matchFilters(p, { brand: b[0], cont: "all" })).length;
+        btn.innerHTML = b[1] + ` <span class="cnt">${cnt}</span>`;
+        btn.onclick = () => {
+          if (state.brand === b[0]) { state.brand = "all"; }
+          else { state.brand = b[0]; state.cont = cont; }
+          refresh();
+        };
+        wrap.appendChild(btn);
+      });
+    });
+  }
+
+  function renderBrandInfo() {
+    const wrap = document.getElementById("brandInfoWrap");
+    const misc = BRAND_MISC[state.brand];
+    if (state.brand === "all" || !misc) {
+      wrap.innerHTML = "";
+      if (brandDocOpen) closeBrandDoc(false);
+      return;
+    }
+    const info = BRAND_HISTORY[state.brand];
+    const meta = BRANDS.find(b => b[0] === state.brand);
+    const logoHtml = misc.logo ? `<img src="${misc.logo}" alt="">` : "";
+    if (!info) {
+      const homeBtn = misc.homepage
+        ? `<a class="bi-home-btn" href="${misc.homepage}" target="_blank" rel="noopener">${misc.name} Homepage &#8599;</a>`
+        : "";
+      wrap.innerHTML = `
+        <div class="brand-info">
+          <div class="bi-logo-row">
+            <div class="bi-logo-wrap">${logoHtml}</div>
+            ${homeBtn}
+          </div>
+        </div>`;
+      if (brandDocOpen) closeBrandDoc(false);
+      return;
+    }
+    const homeBtn = misc.homepage
+      ? `<a class="bi-home-btn" href="${misc.homepage}" target="_blank" rel="noopener">공식 홈페이지 &#8599;</a>`
+      : "";
+    wrap.innerHTML = `
+      <div class="brand-info">
+        <div class="bi-logo-row">
+          <div class="bi-logo-wrap">${logoHtml}</div>
+          ${homeBtn}
+        </div>
+        <div class="bi-body">
+          <p class="bi-name">${meta ? meta[1] : ""}</p>
+          <p class="bi-summary">${info.summary || ""}</p>
+          <div class="bi-facts">
+            ${info.founded ? `<div class="bi-fact"><b>Founded</b>${info.founded}</div>` : ""}
+            ${info.hq ? `<div class="bi-fact"><b>HQ</b>${info.hq}</div>` : ""}
+            ${info.signature ? `<div class="bi-fact"><b>Signature</b>${info.signature}</div>` : ""}
+          </div>
+          <div class="bi-actions">
+            <button class="bi-detail-btn" onclick="openBrandDoc()">브랜드 히스토리 보기</button>
+            ${info.source_url ? `<a class="bi-source-link" href="${info.source_url}" target="_blank" rel="noopener">원본 문서${info.source_url.includes("atlassian.net") ? " (Confluence)" : ""}</a>` : ""}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderBrandDoc() {
+    const info = BRAND_HISTORY[state.brand];
+    if (!info) { closeBrandDoc(false); return; }
+    document.getElementById("brandDocView").innerHTML = `
+      <div class="brand-doc">
+        <div class="brand-doc-hdr">
+          <button class="brand-doc-back" onclick="closeBrandDoc()">&larr; 목록으로</button>
+        </div>
+        <div class="brand-doc-body">${info.html}</div>
+      </div>`;
+  }
+
+  function openBrandDoc(record) {
+    brandDocOpen = true;
+    renderBrandDoc();
+    document.getElementById("mainGridView").style.display = "none";
+    document.getElementById("brandDocView").style.display = "block";
+    if (record !== false) pushNav({ type: "branddoc", brand: state.brand });
+    updateNavButtons();
+  }
+
+  function closeBrandDoc(record) {
+    brandDocOpen = false;
+    document.getElementById("mainGridView").style.display = "";
+    document.getElementById("brandDocView").style.display = "none";
+    if (record !== false) pushNav({ type: "home" });
+    updateNavButtons();
+  }
+
+  function matchFilters(p, overrides) {
+    const s = Object.assign({}, state, overrides || {});
+    if (s.cont && s.cont !== "all" && p.continent !== s.cont) return false;
+    if (s.cat instanceof Set) { if (s.cat.size && !s.cat.has(effCat(p))) return false; }
+    else if (s.cat && s.cat !== "all" && effCat(p) !== s.cat) return false;
+    if (s.type instanceof Set) { if (s.type.size && !s.type.has(effType(p))) return false; }
+    else if (s.type && s.type !== "all" && effType(p) !== s.type) return false;
+    if (s.brand && s.brand !== "all" && p.brand_id !== s.brand) return false;
+    if (s.year && s.year !== "all" && p.year_bucket !== s.year) return false;
+    if (s.q) {
+      const q = s.q.toLowerCase();
+      if (!(p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || (p.desc || "").toLowerCase().includes(q))) return false;
+    }
+    return true;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    const list = DATA.filter(p => matchFilters(p));
+    document.getElementById("gridMeta").textContent = list.length + "개 제품";
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="state"><div class="ico">&#129681;</div><p>조건에 맞는 제품이 없습니다.</p></div>';
+      return;
+    }
+    list.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card" + (selected === p ? " sel" : "");
+      const logoHtml = p.logo
+        ? `<div class="logochip" data-brand="${p.brand_id}"><img src="${p.logo}" alt="${p.brand}"></div>`
+        : `<div class="logochip textonly">${p.brand}</div>`;
+      const pCat = effCat(p), pType = effType(p);
+      card.innerHTML = `
+        <div class="imgwrap">
+          <img class="pimg" src="${(p.images[0] || "")}" alt="${p.name}" loading="lazy" onerror="this.style.opacity=0">
+          ${logoHtml}
+          <button class="copy-btn" title="이미지 복사">${COPY_ICON}</button>
+        </div>
+        <div class="body">
+          <p class="pname">${p.name}</p>
+          <p class="brandname">${p.brand}</p>
+          <div class="tags">
+            <span class="tag cont-${p.continent}">${contLabel[p.continent]}</span>
+            ${pCat ? `<span class="tag">${pCat}</span>` : ""}
+            ${pType ? `<span class="tag">${pType}</span>` : ""}
+            ${p.year ? `<span class="tag">${p.year}</span>` : ""}
+          </div>
+          <span class="price">${p.price || ""}</span>
+        </div>`;
+      card.querySelector(".copy-btn").addEventListener("click", (e) => { e.stopPropagation(); copyImage((p.images[0] || ""), e.currentTarget); });
+      const logoChip = card.querySelector(".logochip");
+      if (logoChip) logoChip.addEventListener("click", (e) => { e.stopPropagation(); filterByBrand(p); });
+      card.addEventListener("click", () => selectCard(p));
+      grid.appendChild(card);
+    });
+  }
+
+  function filterByBrand(p) {
+    state.brand = p.brand_id;
+    state.cont = p.continent;
+    closeDetail(false);
+    refresh();
+  }
+
+  function selectCard(p, record) {
+    selected = p;
+    detIndex = 0;
+    closeSidebar();
+    document.getElementById("detail").classList.remove("hide");
+    document.getElementById("detEmpty").style.display = "none";
+    const filled = document.getElementById("detFilled");
+    filled.style.display = "flex";
+    document.getElementById("dImg").src = (p.images[0] || "");
+    document.getElementById("dBrand").textContent = p.brand;
+    const logoEl = document.getElementById("dLogo");
+    if (p.logo) { logoEl.src = p.logo; logoEl.dataset.brand = p.brand_id; logoEl.style.display = "block"; } else { logoEl.style.display = "none"; }
+    document.getElementById("dBrandRow").onclick = () => filterByBrand(p);
+    document.getElementById("dName").textContent = p.name;
+    document.getElementById("dDesc").textContent = p.desc;
+    document.getElementById("dPriceRow").style.display = p.price ? "" : "none";
+    document.getElementById("dPrice").textContent = p.price || "";
+    document.getElementById("dYear").textContent = p.year || "미상";
+    renderClassifyRow("dCategory", "category", p, taxCategories);
+    renderClassifyRow("dType", "type", p, taxTypes);
+    document.getElementById("dMaterial").textContent = p.material || "—";
+    document.getElementById("dBase").textContent = p.base || "—";
+    document.getElementById("dDesigner").textContent = p.designer || "—";
+    document.getElementById("dLink").href = p.url;
+    renderDots();
+    renderGrid();
+    if (record !== false) pushNav({ type: "detail", product: p });
+    updateNavButtons();
+  }
+
+  function closeDetail(record) {
+    selected = null;
+    document.getElementById("detail").classList.add("hide");
+    renderGrid();
+    if (record !== false) pushNav({ type: "home" });
+    updateNavButtons();
+  }
+
+  function pushNav(entry) {
+    const top = navStack[navIndex];
+    if (top && top.type === "home" && entry.type === "home") { updateNavButtons(); return; }
+    navStack = navStack.slice(0, navIndex + 1);
+    navStack.push(entry);
+    navIndex = navStack.length - 1;
+    updateNavButtons();
+  }
+
+  function updateNavButtons() {
+    document.getElementById("btnBack").disabled = navIndex <= 0;
+    document.getElementById("btnForward").disabled = navIndex >= navStack.length - 1;
+  }
+
+  function applyNavEntry(entry) {
+    if (entry.type === "home") {
+      if (brandDocOpen) closeBrandDoc(false);
+      if (selected) closeDetail(false);
+    } else if (entry.type === "detail") {
+      if (brandDocOpen) closeBrandDoc(false);
+      selectCard(entry.product, false);
+    } else if (entry.type === "branddoc") {
+      if (selected) closeDetail(false);
+      state.brand = entry.brand;
+      refresh();
+      openBrandDoc(false);
+    }
+    updateNavButtons();
+  }
+
+  function goBack() {
+    if (navIndex > 0) { navIndex--; applyNavEntry(navStack[navIndex]); }
+  }
+
+  function goForward() {
+    if (navIndex < navStack.length - 1) { navIndex++; applyNavEntry(navStack[navIndex]); }
+  }
+
+  function goHome() {
+    state = { cont: "all", cat: "all", type: "all", brand: "all", year: "all", q: "" };
+    document.getElementById("searchInp").value = "";
+    if (brandDocOpen) closeBrandDoc(false);
+    if (selected) closeDetail(false);
+    refresh();
+    pushNav({ type: "home" });
+  }
+
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("sidebarBackdrop").classList.toggle("show");
+  }
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarBackdrop").classList.remove("show");
+  }
+  document.getElementById("sidebar").addEventListener("click", (e) => {
+    if (e.target.closest(".fb") && window.innerWidth <= 860) closeSidebar();
+  });
+
+  function refresh() {
+    document.getElementById("brandAllBtn").classList.toggle("on", state.cont === "all" && state.brand === "all");
+    renderYearList();
+    renderCatList();
+    renderTypeList();
+    renderBrandList();
+    renderBrandInfo();
+    renderGrid();
+  }
+
+  document.getElementById("brandAllBtn").addEventListener("click", () => {
+    state.cont = "all"; state.brand = "all"; refresh();
+  });
+
+  document.getElementById("typeAllBtn").addEventListener("click", () => {
+    state.type = new Set(); refresh();
+  });
+
+  document.getElementById("catAllBtn").addEventListener("click", () => {
+    state.cat = new Set(); refresh();
+  });
+
+  document.getElementById("searchInp").addEventListener("input", (e) => {
+    state.q = e.target.value;
+    renderGrid();
+  });
+
+  async function loadLibrary() {
+    const get = (f) => fetch(f).then((r) => {
+      if (!r.ok) throw new Error(f + " " + r.status);
+      return r.json();
+    });
+    const [products, manifest, history] = await Promise.all([
+      get("scripts/product_data_v2.json"),
+      get("scripts/image_manifest.json"),
+      get("scripts/brand_history.json"),
+    ]);
+    ({ DATA, BRANDS, CATEGORIES, YEAR_BUCKETS, TYPES, BRAND_HISTORY, BRAND_MISC } =
+      ChairData.buildLibrary(products, manifest, history, window.CHAIR_IMAGE_BASE));
+  }
+
+  async function boot() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = '<div class="state"><p>제품 목록을 불러오는 중…</p></div>';
+    try {
+      await loadLibrary();
+    } catch (e) {
+      console.error("데이터를 불러오지 못했습니다", e);
+      // 파일을 더블클릭해 열면(file://) 브라우저가 JSON 읽기를 막는다 — 서버로 열어야 한다.
+      grid.innerHTML = '<div class="state"><p>제품 목록을 불러오지 못했습니다.<br>AI Playground 의 앱 주소로 열어 주세요.</p></div>';
+      return;
+    }
+    document.getElementById("brandCount").textContent = BRANDS.length;
+    document.getElementById("productCount").textContent = DATA.length;
+    taxCategories = CATEGORIES.slice();
+    taxTypes = TYPES.slice();
+    refresh();
+    initClassifyDb();
+  }
+
+  boot();
+</script>
